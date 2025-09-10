@@ -47,6 +47,17 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // NutriVerse custom colors
+        fresh: {
+          DEFAULT: "hsl(var(--fresh-green))",
+          light: "hsl(var(--fresh-green-light))",
+        },
+        cooking: {
+          DEFAULT: "hsl(var(--cooking-orange))",
+          light: "hsl(var(--cooking-orange-light))",
+        },
+        cream: "hsl(var(--neutral-cream))",
+        beige: "hsl(var(--warm-beige))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -57,6 +68,20 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
+      backgroundImage: {
+        'gradient-hero': 'var(--gradient-hero)',
+        'gradient-warm': 'var(--gradient-warm)',
+        'gradient-subtle': 'var(--gradient-subtle)',
+      },
+      boxShadow: {
+        'soft': 'var(--shadow-soft)',
+        'warm': 'var(--shadow-warm)',
+        'card': 'var(--shadow-card)',
+      },
+      transitionTimingFunction: {
+        'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'bounce': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
       },
       borderRadius: {
         lg: "var(--radius)",
