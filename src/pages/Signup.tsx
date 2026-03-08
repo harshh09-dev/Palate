@@ -3,7 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { UtensilsCrossed, Mail, Lock, Eye, EyeOff, User } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
+import { motion } from "framer-motion";
+import PalateLogo from "@/components/PalateLogo";
+import heroBg from "@/assets/hero-bg.jpg";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -20,31 +23,23 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left side */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-warm relative overflow-hidden items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-br from-accent/90 to-cooking-light/80" />
-        <div className="relative z-10 p-12 text-center">
-          <UtensilsCrossed className="w-20 h-20 text-accent-foreground mx-auto mb-6" />
-          <h2 className="text-4xl font-bold text-accent-foreground mb-4">
-            Join Palate
-          </h2>
-          <p className="text-accent-foreground/80 text-lg max-w-md">
-            Start your journey to smarter cooking with AI-powered meal planning and recipe discovery.
-          </p>
-        </div>
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center">
+        <img src={heroBg} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-br from-accent/90 to-accent/70" />
+        <motion.div className="relative z-10 p-12 text-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+          <PalateLogo size="xl" showText={false} className="mx-auto mb-6 [&_img]:brightness-0 [&_img]:invert" />
+          <h2 className="text-4xl font-bold text-accent-foreground mb-4" style={{ fontFamily: "var(--font-display)" }}>Join Palate</h2>
+          <p className="text-accent-foreground/80 text-lg max-w-md">Start your journey to smarter cooking with AI-powered meal planning and recipe discovery.</p>
+        </motion.div>
         <div className="absolute w-64 h-64 rounded-full bg-accent-foreground/5 -bottom-20 -right-20" />
         <div className="absolute w-48 h-48 rounded-full bg-accent-foreground/5 top-20 -left-10" />
       </div>
 
-      {/* Right side */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md space-y-8">
+        <motion.div className="w-full max-w-md space-y-8" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
           <div className="text-center lg:text-left">
-            <div className="flex items-center gap-2 justify-center lg:justify-start mb-6 lg:hidden">
-              <UtensilsCrossed className="w-8 h-8 text-accent" />
-              <span className="text-2xl font-bold text-foreground">Palate</span>
-            </div>
-            <h1 className="text-3xl font-bold text-foreground">Create your account</h1>
+            <div className="flex justify-center lg:justify-start mb-6 lg:hidden"><PalateLogo size="md" /></div>
+            <h1 className="text-3xl font-bold text-foreground" style={{ fontFamily: "var(--font-display)" }}>Create your account</h1>
             <p className="text-muted-foreground mt-2">Start your culinary journey today</p>
           </div>
 
@@ -56,7 +51,6 @@ const Signup = () => {
                 <Input id="name" placeholder="John Doe" className="pl-10" value={form.name} onChange={update("name")} />
               </div>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
@@ -64,25 +58,16 @@ const Signup = () => {
                 <Input id="email" type="email" placeholder="you@example.com" className="pl-10" value={form.email} onChange={update("email")} />
               </div>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  className="pl-10 pr-10"
-                  value={form.password}
-                  onChange={update("password")}
-                />
+                <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" className="pl-10 pr-10" value={form.password} onChange={update("password")} />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="confirm">Confirm Password</Label>
               <div className="relative">
@@ -90,17 +75,12 @@ const Signup = () => {
                 <Input id="confirm" type="password" placeholder="••••••••" className="pl-10" value={form.confirmPassword} onChange={update("confirmPassword")} />
               </div>
             </div>
-
-            <Button type="submit" className="w-full" size="lg">
-              Create Account
-            </Button>
+            <Button type="submit" variant="hero" className="w-full" size="lg">Create Account</Button>
           </form>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-            </div>
+            <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">Or continue with</span></div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -116,11 +96,9 @@ const Signup = () => {
 
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link to="/login" className="text-primary font-medium hover:underline">
-              Sign in
-            </Link>
+            <Link to="/login" className="text-primary font-medium hover:underline">Sign in</Link>
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
