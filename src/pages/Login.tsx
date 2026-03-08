@@ -3,7 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { UtensilsCrossed, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { motion } from "framer-motion";
+import PalateLogo from "@/components/PalateLogo";
+import heroBg from "@/assets/hero-bg.jpg";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -13,38 +16,46 @@ const Login = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock login - will be replaced with real auth
     navigate("/dashboard");
   };
 
   return (
     <div className="min-h-screen flex">
       {/* Left side - visual */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-hero relative overflow-hidden items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-fresh-light/80" />
-        <div className="relative z-10 p-12 text-center">
-          <UtensilsCrossed className="w-20 h-20 text-primary-foreground mx-auto mb-6" />
-          <h2 className="text-4xl font-bold text-primary-foreground mb-4">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center">
+        <img src={heroBg} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-primary/70" />
+        <motion.div
+          className="relative z-10 p-12 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <PalateLogo size="xl" showText={false} className="mx-auto mb-6 [&_img]:brightness-0 [&_img]:invert" />
+          <h2 className="text-4xl font-bold text-primary-foreground mb-4" style={{ fontFamily: "var(--font-display)" }}>
             Welcome to Palate
           </h2>
           <p className="text-primary-foreground/80 text-lg max-w-md">
             Your AI-powered culinary assistant that helps you plan meals, discover recipes, and eat smarter.
           </p>
-        </div>
-        {/* Decorative elements */}
+        </motion.div>
         <div className="absolute w-64 h-64 rounded-full bg-primary-foreground/5 -bottom-20 -left-20" />
         <div className="absolute w-48 h-48 rounded-full bg-primary-foreground/5 top-20 -right-10" />
       </div>
 
       {/* Right side - form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md space-y-8">
+        <motion.div
+          className="w-full max-w-md space-y-8"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className="text-center lg:text-left">
-            <div className="flex items-center gap-2 justify-center lg:justify-start mb-6 lg:hidden">
-              <UtensilsCrossed className="w-8 h-8 text-primary" />
-              <span className="text-2xl font-bold text-foreground">Palate</span>
+            <div className="flex justify-center lg:justify-start mb-6 lg:hidden">
+              <PalateLogo size="md" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground">Welcome back</h1>
+            <h1 className="text-3xl font-bold text-foreground" style={{ fontFamily: "var(--font-display)" }}>Welcome back</h1>
             <p className="text-muted-foreground mt-2">Sign in to your account to continue</p>
           </div>
 
@@ -53,57 +64,28 @@ const Login = () => {
               <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  className="pl-10"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+                <Input id="email" type="email" placeholder="you@example.com" className="pl-10" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  className="pl-10 pr-10"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
+                <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" className="pl-10 pr-10" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
-
             <div className="flex justify-end">
-              <Link to="/forgot-password" className="text-sm text-primary hover:underline">
-                Forgot password?
-              </Link>
+              <Link to="/forgot-password" className="text-sm text-primary hover:underline">Forgot password?</Link>
             </div>
-
-            <Button type="submit" className="w-full" size="lg">
-              Login
-            </Button>
+            <Button type="submit" variant="hero" className="w-full" size="lg">Login</Button>
           </form>
 
           <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-            </div>
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
+            <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">Or continue with</span></div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -119,11 +101,9 @@ const Login = () => {
 
           <p className="text-center text-sm text-muted-foreground">
             Don't have an account?{" "}
-            <Link to="/signup" className="text-primary font-medium hover:underline">
-              Create account
-            </Link>
+            <Link to="/signup" className="text-primary font-medium hover:underline">Create account</Link>
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

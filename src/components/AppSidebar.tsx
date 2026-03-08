@@ -1,31 +1,14 @@
 import {
-  LayoutDashboard,
-  ChefHat,
-  CalendarDays,
-  Activity,
-  ShoppingCart,
-  Users,
-  UserCircle,
-  Settings,
-  LogOut,
-  UtensilsCrossed,
-  Sparkles,
+  LayoutDashboard, ChefHat, CalendarDays, Activity,
+  ShoppingCart, Users, UserCircle, Settings, LogOut, Sparkles,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarHeader,
-  SidebarFooter,
-  SidebarSeparator,
-  useSidebar,
+  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
+  SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
+  SidebarHeader, SidebarFooter, SidebarSeparator, useSidebar,
 } from "@/components/ui/sidebar";
+import PalateLogo from "./PalateLogo";
 
 const mainNav = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -51,12 +34,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="p-4">
-        <div className="flex items-center gap-2">
-          <UtensilsCrossed className="w-7 h-7 text-primary shrink-0" />
-          {!collapsed && (
-            <span className="text-xl font-bold text-foreground">Palate</span>
-          )}
-        </div>
+        <PalateLogo size="sm" showText={!collapsed} />
       </SidebarHeader>
 
       <SidebarContent>
@@ -97,10 +75,7 @@ export function AppSidebar() {
             </SidebarMenuItem>
           ))}
           <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={() => navigate("/login")}
-              tooltip="Logout"
-            >
+            <SidebarMenuButton onClick={() => navigate("/login")} tooltip="Logout">
               <LogOut className="w-4 h-4" />
               {!collapsed && <span>Logout</span>}
             </SidebarMenuButton>
