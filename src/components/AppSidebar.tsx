@@ -9,6 +9,7 @@ import {
   Settings,
   LogOut,
   UtensilsCrossed,
+  Sparkles,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
