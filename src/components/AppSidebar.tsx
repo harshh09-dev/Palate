@@ -30,6 +30,7 @@ import {
 const mainNav = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Recipes", url: "/recipes", icon: ChefHat },
+  { title: "AI Generator", url: "/ai-generator", icon: Sparkles },
   { title: "Meal Planner", url: "/planner", icon: CalendarDays },
   { title: "Nutrition", url: "/nutrition", icon: Activity },
   { title: "Grocery List", url: "/grocery", icon: ShoppingCart },
