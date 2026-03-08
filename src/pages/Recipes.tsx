@@ -44,7 +44,7 @@ const Recipes = () => {
             <Button onClick={() => navigate("/ai-generator")} className="gap-2">
               <Sparkles className="w-4 h-4" /> AI Generate
             </Button>
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2" onClick={() => navigate("/recipes/create")}>
               <Plus className="w-4 h-4" /> Create Recipe
             </Button>
           </div>

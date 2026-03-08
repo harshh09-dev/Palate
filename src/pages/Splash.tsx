@@ -13,7 +13,7 @@ const Splash = () => {
     }, 30);
 
     const timeout = setTimeout(() => {
-      navigate("/login");
+      navigate("/home");
     }, 2000);
 
     return () => {
