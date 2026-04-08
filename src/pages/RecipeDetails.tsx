@@ -1,129 +1,110 @@
-import DashboardLayout from "@/components/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import AppShell from "@/components/AppShell";
+import { useParams, useNavigate } from "react-router-dom";
+import { mockRecipes, mockSavedItems } from "@/lib/mockData";
+import { getExpiryStatus, getDaysRemaining } from "@/lib/expiry";
+import { motion } from "framer-motion";
+import { ArrowLeft, Heart, Bookmark, Clock, Flame, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Heart, Share2, CalendarPlus, ShoppingCart, Clock, Flame, Users } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
-
-const recipe = {
-  id: "1",
-  title: "Avocado Toast & Eggs",
-  author: "Chef Maria",
-  likes: 234,
-  time: "15 min",
-  servings: 2,
-  calories: 380,
-  image: "🥑",
-  tags: ["Quick Meals", "Vegetarian"],
-  ingredients: [
-    "2 slices sourdough bread",
-    "1 ripe avocado",
-    "2 eggs",
-    "1 tbsp olive oil",
-    "Salt & pepper to taste",
-    "Red pepper flakes",
-    "Lemon juice",
-  ],
-  instructions: [
-    "Toast the sourdough bread until golden and crispy.",
-    "While bread is toasting, heat olive oil in a non-stick pan over medium heat.",
-    "Crack eggs into the pan and cook sunny-side up for 3-4 minutes.",
-    "Halve the avocado, remove pit, and scoop flesh into a bowl.",
-    "Mash avocado with lemon juice, salt, and pepper.",
-    "Spread mashed avocado evenly on toasted bread.",
-    "Top each slice with a fried egg.",
-    "Sprinkle red pepper flakes and serve immediately.",
-  ],
-  nutrition: { calories: 380, protein: 18, carbs: 32, fat: 22, fiber: 8 },
-};
 
 const RecipeDetails = () => {
-  const navigate = useNavigate();
   const { id } = useParams();
+  const navigate = useNavigate();
+  const recipe = mockRecipes.find((r) => r.id === id);
+
+  if (!recipe) {
+    return (
+      <AppShell>
+        <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
+          <p className="text-muted-foreground">Recipe not found</p>
+          <Button onClick={() => navigate("/recipes")} variant="outline">Go back</Button>
+        </div>
+      </AppShell>
+    );
+  }
+
+  const matchingItems = mockSavedItems.filter(
+    (item) => recipe.ingredients.some((ing) => ing.toLowerCase().includes(item.name.toLowerCase())) &&
+      (getExpiryStatus(item.expiryDate) === "soon" || getExpiryStatus(item.expiryDate) === "expired")
+  );
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6 max-w-4xl">
-        <Button variant="ghost" size="sm" className="gap-2" onClick={() => navigate("/recipes")}>
-          <ArrowLeft className="w-4 h-4" /> Back to Recipes
-        </Button>
-
-        {/* Hero */}
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="h-56 md:w-72 bg-muted rounded-xl flex items-center justify-center text-7xl shrink-0">
-            {recipe.image}
+    <AppShell>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5 -mx-4 -mt-4">
+        <div className="relative h-56 bg-secondary flex items-center justify-center text-7xl">
+          {recipe.image}
+          <button onClick={() => navigate(-1)} className="absolute top-4 left-4 w-9 h-9 rounded-full glass flex items-center justify-center">
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          <div className="absolute top-4 right-4 flex gap-2">
+            <button className="w-9 h-9 rounded-full glass flex items-center justify-center">
+              <Heart className={`w-4 h-4 ${recipe.liked ? "fill-red-500 text-red-500" : ""}`} />
+            </button>
+            <button className="w-9 h-9 rounded-full glass flex items-center justify-center">
+              <Bookmark className={`w-4 h-4 ${recipe.saved ? "fill-primary text-primary" : ""}`} />
+            </button>
           </div>
-          <div className="space-y-3 flex-1">
-            <h1 className="text-3xl font-bold text-foreground">{recipe.title}</h1>
-            <p className="text-muted-foreground">By {recipe.author}</p>
-            <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1"><Heart className="w-4 h-4 text-destructive" />{recipe.likes}</span>
+        </div>
+
+        <div className="px-4 space-y-5">
+          <div>
+            <h1 className="text-2xl font-bold">{recipe.title}</h1>
+            <p className="text-sm text-muted-foreground mt-1">by {recipe.author}</p>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
               <span className="flex items-center gap-1"><Clock className="w-4 h-4" />{recipe.time}</span>
-              <span className="flex items-center gap-1"><Users className="w-4 h-4" />{recipe.servings} servings</span>
               <span className="flex items-center gap-1"><Flame className="w-4 h-4" />{recipe.calories} cal</span>
-            </div>
-            <div className="flex gap-2">
-              {recipe.tags.map((t) => <Badge key={t} variant="secondary">{t}</Badge>)}
-            </div>
-            <div className="flex flex-wrap gap-2 pt-2">
-              <Button size="sm" className="gap-1"><Heart className="w-3.5 h-3.5" /> Save</Button>
-              <Button size="sm" variant="outline" className="gap-1"><CalendarPlus className="w-3.5 h-3.5" /> Add to Plan</Button>
-              <Button size="sm" variant="outline" className="gap-1"><ShoppingCart className="w-3.5 h-3.5" /> Grocery</Button>
-              <Button size="sm" variant="ghost" className="gap-1"><Share2 className="w-3.5 h-3.5" /> Share</Button>
+              <span>❤️ {recipe.likes}</span>
             </div>
           </div>
-        </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {/* Ingredients */}
-          <Card>
-            <CardHeader><CardTitle className="text-lg">Ingredients</CardTitle></CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {recipe.ingredients.map((ing, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-foreground">
-                    <div className="w-4 h-4 mt-0.5 rounded border border-border shrink-0" />
-                    {ing}
-                  </li>
+          {matchingItems.length > 0 && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-4 border-yellow-500/30">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="w-4 h-4 text-yellow-400" />
+                <span className="text-sm font-semibold text-yellow-400">Expiry Insight</span>
+              </div>
+              <p className="text-xs text-muted-foreground">You have ingredients expiring soon:</p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {matchingItems.map((item) => (
+                  <span key={item.id} className="text-xs bg-yellow-500/15 text-yellow-400 border border-yellow-500/25 px-2 py-0.5 rounded-full">
+                    {item.emoji} {item.name} ({getDaysRemaining(item.expiryDate)}d left)
+                  </span>
                 ))}
-              </ul>
-            </CardContent>
-          </Card>
+              </div>
+            </motion.div>
+          )}
 
-          {/* Instructions */}
-          <Card className="md:col-span-2">
-            <CardHeader><CardTitle className="text-lg">Instructions</CardTitle></CardHeader>
-            <CardContent>
-              <ol className="space-y-4">
-                {recipe.instructions.map((step, i) => (
-                  <li key={i} className="flex gap-3 text-sm">
-                    <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0">
-                      {i + 1}
-                    </span>
-                    <span className="text-foreground">{step}</span>
-                  </li>
-                ))}
-              </ol>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Nutrition */}
-        <Card>
-          <CardHeader><CardTitle className="text-lg">Nutrition per Serving</CardTitle></CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-5 gap-4 text-center">
-              {Object.entries(recipe.nutrition).map(([key, val]) => (
-                <div key={key}>
-                  <p className="text-2xl font-bold text-foreground">{val}</p>
-                  <p className="text-xs text-muted-foreground capitalize">{key === "calories" ? "kcal" : `g ${key}`}</p>
+          <div>
+            <h2 className="text-lg font-bold mb-3">Ingredients</h2>
+            <div className="space-y-2">
+              {recipe.ingredients.map((ing, i) => (
+                <div key={i} className="glass-card px-4 py-3 flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                  <span className="text-sm">{ing}</span>
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    </DashboardLayout>
+          </div>
+
+          <div>
+            <h2 className="text-lg font-bold mb-3">Steps</h2>
+            <div className="space-y-3">
+              {recipe.steps.map((step, i) => (
+                <div key={i} className="flex gap-3">
+                  <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                    {i + 1}
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{step}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <Button className="w-full h-12 rounded-2xl text-base font-semibold glow-emerald">
+            Save with Expiry Tracking
+          </Button>
+        </div>
+      </motion.div>
+    </AppShell>
   );
 };
 
