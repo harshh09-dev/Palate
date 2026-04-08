@@ -1,162 +1,125 @@
-import DashboardLayout from "@/components/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Coffee, Sun, Moon, Cookie, ShoppingCart, TrendingUp, CalendarDays, ChefHat } from "lucide-react";
-
-const todaysMeals = [
-  { meal: "Breakfast", recipe: "Avocado Toast & Eggs", calories: 380, icon: Coffee },
-  { meal: "Lunch", recipe: "Grilled Chicken Salad", calories: 450, icon: Sun },
-  { meal: "Dinner", recipe: "Pasta Primavera", calories: 520, icon: Moon },
-  { meal: "Snack", recipe: "Greek Yogurt & Berries", calories: 180, icon: Cookie },
-];
-
-const nutritionData = [
-  { label: "Calories", value: 1530, target: 2000, unit: "kcal", color: "bg-primary" },
-  { label: "Protein", value: 95, target: 120, unit: "g", color: "bg-accent" },
-  { label: "Carbs", value: 180, target: 250, unit: "g", color: "bg-fresh-light" },
-  { label: "Fat", value: 55, target: 70, unit: "g", color: "bg-cooking-light" },
-];
-
-const groceryItems = ["Milk", "Eggs", "Tomatoes", "Chicken", "Spinach", "Olive Oil", "Rice", "Lemons"];
+import AppShell from "@/components/AppShell";
+import SearchBar from "@/components/SearchBar";
+import ExpiryBadge from "@/components/ExpiryBadge";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { mockRecipes, mockSavedItems, categories } from "@/lib/mockData";
+import { getExpiryStatus } from "@/lib/expiry";
+import { motion } from "framer-motion";
+import { Flame, Clock, ArrowRight } from "lucide-react";
 
 const Dashboard = () => {
+  const [search, setSearch] = useState("");
+  const [activeCategory, setActiveCategory] = useState("All");
+  const navigate = useNavigate();
+
+  const expiringItems = mockSavedItems
+    .filter((i) => getExpiryStatus(i.expiryDate) === "soon" || getExpiryStatus(i.expiryDate) === "expired")
+    .sort((a, b) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime());
+
+  const expiryRecipes = mockRecipes.filter((r) => r.expiryMatch);
+
   return (
-    <DashboardLayout>
+    <AppShell>
       <div className="space-y-6">
-        {/* Greeting */}
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Good morning! 👋</h1>
-          <p className="text-muted-foreground mt-1">Here's your cooking overview for today</p>
-        </div>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          <h1 className="text-2xl font-bold text-foreground">Hello Anjali 👋</h1>
+          <p className="text-muted-foreground text-sm mt-1">What do you want to cook today?</p>
+        </motion.div>
 
-        {/* Quick stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { label: "Recipes Saved", value: "24", icon: ChefHat },
-            { label: "Meals Planned", value: "18", icon: CalendarDays },
-            { label: "Calories Today", value: "1,530", icon: TrendingUp },
-            { label: "Grocery Items", value: "8", icon: ShoppingCart },
-          ].map((stat) => (
-            <Card key={stat.label}>
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <stat.icon className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                  <p className="text-xs text-muted-foreground">{stat.label}</p>
-                </div>
-              </CardContent>
-            </Card>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+          <SearchBar value={search} onChange={setSearch} />
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+          {categories.map((cat) => (
+            <button
+              key={cat.label}
+              onClick={() => setActiveCategory(cat.label)}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                activeCategory === cat.label
+                  ? "bg-primary text-primary-foreground glow-emerald-sm"
+                  : "glass text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <span>{cat.emoji}</span>
+              {cat.label}
+            </button>
           ))}
-        </div>
+        </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Today's Meals */}
-          <div className="lg:col-span-2 space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Today's Meals</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {todaysMeals.map((item) => (
-                  <div key={item.meal} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <item.icon className="w-4 h-4 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-foreground text-sm">{item.meal}</p>
-                        <p className="text-xs text-muted-foreground">{item.recipe}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-foreground">{item.calories} cal</p>
-                      <Button variant="ghost" size="sm" className="text-xs h-6 px-2">Edit</Button>
-                    </div>
+        {expiringItems.length > 0 && (
+          <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-bold flex items-center gap-2">
+                <Flame className="w-5 h-5 text-primary" />
+                Cook Before It Expires
+              </h2>
+              <button onClick={() => navigate("/saved")} className="text-primary text-xs font-medium flex items-center gap-1">
+                View all <ArrowRight className="w-3 h-3" />
+              </button>
+            </div>
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+              {expiringItems.map((item) => (
+                <div key={item.id} className="glass-card p-3 min-w-[120px] flex flex-col items-center gap-2">
+                  <span className="text-3xl">{item.emoji}</span>
+                  <span className="text-xs font-medium text-foreground">{item.name}</span>
+                  <ExpiryBadge expiryDate={item.expiryDate} showDays />
+                </div>
+              ))}
+            </div>
+          </motion.section>
+        )}
+
+        <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <h2 className="text-lg font-bold mb-3">🧠 Smart Suggestions</h2>
+          <div className="space-y-3">
+            {expiryRecipes.map((recipe) => (
+              <div
+                key={recipe.id}
+                onClick={() => navigate(`/recipes/${recipe.id}`)}
+                className="glass-card p-4 flex items-center gap-4 cursor-pointer hover:bg-white/10 transition-all active:scale-[0.98]"
+              >
+                <div className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center text-3xl flex-shrink-0">
+                  {recipe.image}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm text-foreground truncate">{recipe.title}</h3>
+                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-1">
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{recipe.time}</span>
+                    <span className="flex items-center gap-1"><Flame className="w-3 h-3" />{recipe.calories} cal</span>
                   </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* Nutrition Summary */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Nutrition Summary</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {nutritionData.map((item) => {
-                    const pct = Math.round((item.value / item.target) * 100);
-                    return (
-                      <div key={item.label} className="text-center">
-                        <div className="relative w-16 h-16 mx-auto mb-2">
-                          <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
-                            <path className="text-muted" strokeDasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" />
-                            <path className="text-primary" strokeDasharray={`${pct}, 100`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-                          </svg>
-                          <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-foreground">{pct}%</span>
-                        </div>
-                        <p className="text-sm font-medium text-foreground">{item.value}{item.unit}</p>
-                        <p className="text-xs text-muted-foreground">{item.label}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar widgets */}
-          <div className="space-y-4">
-            {/* Weekly Preview */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Weekly Preview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-7 gap-1 text-center">
-                  {["M", "T", "W", "T", "F", "S", "S"].map((day, i) => (
-                    <div key={i} className={`p-2 rounded-lg text-xs font-medium ${i === 1 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
-                      {day}
-                    </div>
-                  ))}
-                </div>
-                <p className="text-xs text-muted-foreground mt-3 text-center">3 of 7 days planned</p>
-              </CardContent>
-            </Card>
-
-            {/* Grocery Reminder */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center justify-between">
-                  Grocery List
-                  <span className="text-xs bg-accent/10 text-accent px-2 py-1 rounded-full font-normal">
-                    {groceryItems.length} items
+                  <span className="inline-block mt-1.5 text-[10px] font-semibold text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full">
+                    Uses expiring items
                   </span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {groceryItems.slice(0, 5).map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-sm text-foreground">
-                      <div className="w-4 h-4 rounded border border-border" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                {groceryItems.length > 5 && (
-                  <p className="text-xs text-muted-foreground mt-2">+{groceryItems.length - 5} more items</p>
-                )}
-                <Button variant="outline" size="sm" className="w-full mt-3">
-                  View Grocery List
-                </Button>
-              </CardContent>
-            </Card>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        </motion.section>
+
+        <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+          <h2 className="text-lg font-bold mb-3">🔥 Trending Recipes</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {mockRecipes.slice(0, 4).map((recipe) => (
+              <div
+                key={recipe.id}
+                onClick={() => navigate(`/recipes/${recipe.id}`)}
+                className="glass-card overflow-hidden cursor-pointer hover:bg-white/10 transition-all active:scale-[0.98]"
+              >
+                <div className="h-24 bg-secondary flex items-center justify-center text-4xl">
+                  {recipe.image}
+                </div>
+                <div className="p-3">
+                  <h3 className="font-semibold text-xs text-foreground truncate">{recipe.title}</h3>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">{recipe.time} · {recipe.calories} cal</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.section>
       </div>
-    </DashboardLayout>
+    </AppShell>
   );
 };
 

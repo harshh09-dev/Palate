@@ -1,27 +1,20 @@
-import DashboardLayout from "@/components/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import AppShell from "@/components/AppShell";
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Camera, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, X, Clock, Flame, Upload, ArrowLeft } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const CreateRecipe = () => {
-  const navigate = useNavigate();
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [cookTime, setCookTime] = useState("");
-  const [calories, setCalories] = useState("");
-  const [servings, setServings] = useState("4");
   const [ingredient, setIngredient] = useState("");
   const [ingredients, setIngredients] = useState<string[]>([]);
-  const [instruction, setInstruction] = useState("");
-  const [instructions, setInstructions] = useState<string[]>([]);
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState("");
+  const [step, setStep] = useState("");
+  const [steps, setSteps] = useState<string[]>([]);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const addIngredient = () => {
     if (ingredient.trim()) {
@@ -30,170 +23,71 @@ const CreateRecipe = () => {
     }
   };
 
-  const addInstruction = () => {
-    if (instruction.trim()) {
-      setInstructions([...instructions, instruction.trim()]);
-      setInstruction("");
+  const addStep = () => {
+    if (step.trim()) {
+      setSteps([...steps, step.trim()]);
+      setStep("");
     }
   };
 
-  const addTag = () => {
-    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
-      setTags([...tags, tagInput.trim()]);
-      setTagInput("");
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Mock save — will integrate with backend
+  const handleSubmit = () => {
+    toast({ title: "Recipe Created!", description: "Your recipe has been saved." });
     navigate("/recipes");
   };
 
   return (
-    <DashboardLayout>
-      <div className="max-w-3xl mx-auto space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Create Recipe</h1>
-            <p className="text-muted-foreground mt-1">Share your culinary creation</p>
+    <AppShell>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+        <h1 className="text-2xl font-bold">Add Recipe</h1>
+
+        <div className="glass-card h-40 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white/10 transition-colors">
+          <Camera className="w-8 h-8 text-muted-foreground" />
+          <span className="text-sm text-muted-foreground">Tap to add photo</span>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Title</label>
+          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Recipe name..." className="h-11 rounded-2xl glass border-white/10 bg-white/5" />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Ingredients</label>
+          <div className="flex gap-2">
+            <Input value={ingredient} onChange={(e) => setIngredient(e.target.value)} placeholder="Add ingredient..." className="h-11 rounded-2xl glass border-white/10 bg-white/5 flex-1" onKeyDown={(e) => e.key === "Enter" && addIngredient()} />
+            <Button onClick={addIngredient} size="icon" className="h-11 w-11 rounded-2xl"><Plus className="w-4 h-4" /></Button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {ingredients.map((ing, i) => (
+              <span key={i} className="glass-card px-3 py-1.5 text-xs flex items-center gap-1.5">
+                {ing}
+                <X className="w-3 h-3 cursor-pointer text-muted-foreground hover:text-foreground" onClick={() => setIngredients(ingredients.filter((_, j) => j !== i))} />
+              </span>
+            ))}
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Image Upload */}
-          <Card>
-            <CardContent className="p-6">
-              <div className="border-2 border-dashed border-border rounded-xl h-48 flex flex-col items-center justify-center gap-3 text-muted-foreground hover:border-primary/50 transition-colors cursor-pointer">
-                <Upload className="w-8 h-8" />
-                <p className="text-sm">Click to upload recipe image</p>
-                <p className="text-xs">PNG, JPG up to 5MB</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Basic Info */}
-          <Card>
-            <CardHeader><CardTitle>Basic Info</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Recipe Title</Label>
-                <Input id="title" placeholder="e.g. Avocado Toast & Eggs" value={title} onChange={(e) => setTitle(e.target.value)} required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="desc">Description</Label>
-                <Textarea id="desc" placeholder="Describe your recipe..." value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label><Clock className="w-3 h-3 inline mr-1" />Cook Time</Label>
-                  <Input placeholder="e.g. 30 min" value={cookTime} onChange={(e) => setCookTime(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <Label><Flame className="w-3 h-3 inline mr-1" />Calories</Label>
-                  <Input placeholder="e.g. 450" value={calories} onChange={(e) => setCalories(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Servings</Label>
-                  <Input placeholder="e.g. 4" value={servings} onChange={(e) => setServings(e.target.value)} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Ingredients */}
-          <Card>
-            <CardHeader><CardTitle>Ingredients</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Add an ingredient..."
-                  value={ingredient}
-                  onChange={(e) => setIngredient(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addIngredient())}
-                />
-                <Button type="button" variant="outline" onClick={addIngredient}><Plus className="w-4 h-4" /></Button>
-              </div>
-              {ingredients.length > 0 && (
-                <ul className="space-y-2">
-                  {ingredients.map((ing, i) => (
-                    <li key={i} className="flex items-center justify-between bg-muted/50 px-3 py-2 rounded-lg text-sm text-foreground">
-                      <span>• {ing}</span>
-                      <button type="button" onClick={() => setIngredients(ingredients.filter((_, j) => j !== i))}>
-                        <X className="w-4 h-4 text-muted-foreground hover:text-destructive" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Instructions */}
-          <Card>
-            <CardHeader><CardTitle>Instructions</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex gap-2">
-                <Textarea
-                  placeholder="Add a step..."
-                  value={instruction}
-                  onChange={(e) => setInstruction(e.target.value)}
-                  rows={2}
-                  className="flex-1"
-                />
-                <Button type="button" variant="outline" onClick={addInstruction} className="self-end"><Plus className="w-4 h-4" /></Button>
-              </div>
-              {instructions.length > 0 && (
-                <ol className="space-y-2">
-                  {instructions.map((step, i) => (
-                    <li key={i} className="flex items-start justify-between bg-muted/50 px-3 py-2 rounded-lg text-sm text-foreground gap-3">
-                      <span><strong className="text-primary">{i + 1}.</strong> {step}</span>
-                      <button type="button" className="shrink-0" onClick={() => setInstructions(instructions.filter((_, j) => j !== i))}>
-                        <X className="w-4 h-4 text-muted-foreground hover:text-destructive" />
-                      </button>
-                    </li>
-                  ))}
-                </ol>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Tags */}
-          <Card>
-            <CardHeader><CardTitle>Tags</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Add a tag..."
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
-                />
-                <Button type="button" variant="outline" onClick={addTag}><Plus className="w-4 h-4" /></Button>
-              </div>
-              {tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {tags.map((t) => (
-                    <Badge key={t} variant="secondary" className="gap-1 cursor-pointer" onClick={() => setTags(tags.filter((x) => x !== t))}>
-                      {t} <X className="w-3 h-3" />
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Submit */}
-          <div className="flex gap-3">
-            <Button type="submit" className="flex-1" size="lg">Publish Recipe</Button>
-            <Button type="button" variant="outline" size="lg" onClick={() => navigate(-1)}>Cancel</Button>
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Steps</label>
+          <div className="flex gap-2">
+            <Input value={step} onChange={(e) => setStep(e.target.value)} placeholder="Add step..." className="h-11 rounded-2xl glass border-white/10 bg-white/5 flex-1" onKeyDown={(e) => e.key === "Enter" && addStep()} />
+            <Button onClick={addStep} size="icon" className="h-11 w-11 rounded-2xl"><Plus className="w-4 h-4" /></Button>
           </div>
-        </form>
-      </div>
-    </DashboardLayout>
+          <div className="space-y-2">
+            {steps.map((s, i) => (
+              <div key={i} className="glass-card px-4 py-3 flex items-start gap-3">
+                <span className="w-5 h-5 rounded-full bg-primary/20 text-primary text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                <span className="text-sm flex-1">{s}</span>
+                <X className="w-3.5 h-3.5 cursor-pointer text-muted-foreground hover:text-foreground flex-shrink-0 mt-0.5" onClick={() => setSteps(steps.filter((_, j) => j !== i))} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <Button onClick={handleSubmit} className="w-full h-12 rounded-2xl text-base font-semibold glow-emerald">
+          Create Recipe
+        </Button>
+      </motion.div>
+    </AppShell>
   );
 };
 
